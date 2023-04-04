@@ -22,13 +22,11 @@ Exemplo de requisição:
 
 ##### Json
 ```
-*
 {
   "ano": 2022,
   "database": "cotas",
   "formato": "csv"
 }
-*
 ```
 
 ### Desenvolvedor
