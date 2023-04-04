@@ -5,39 +5,64 @@ from pydantic import BaseModel
 from typing import Optional
 import os
 import zipfile
-import uvicorn
 import wget
 
 
-class CrawlerDeputados():
 
+class CrawlerDeputados():
+    
     def __init__(self):
         pass
     
-    def download_csv(self, year: int, database: str, formato: str):
+    def download(self, ano: Optional[int], database: str, formato: str):
         # Verificar se a base de dados é válida
-        if database not in ["deputado", "cotas"]:
+        if database not in ["cotas", "proposicoes","proposicoes","proposicoesTemas","proposicoesAutores","eventos","eventosOrgaos","eventosPresencaDeputados","eventosRequerimentos","votacoes","votacoesOrientacoes","votacoesVotos","votacoesObjetos","votacoesProposicoes","licitacoes","licitacoesContratos","licitacoesItens","licitacoesPedidos","licitacoesPropostas","frentes","frentesDeputados","deputados","deputadosOcupacoes","deputadosProfissoes"]:
             raise HTTPException(status_code=400, detail="Base de dados inválida")
+        
+        if formato not in ["csv", "xlsx","ods","json","xml"]:
+            raise HTTPException(status_code=400, detail="Formato de dados inválida")        
 
         # Montar a URL para baixar o arquivo
-        url = f"http://www.camara.leg.br/{database}/Ano-{year}.{formato}.zip"
+        if database == "cotas":
+            if not ano:
+                raise HTTPException(status_code=400, detail="O ano é obrigatório para esta base de dados")
+            url = f"http://www.camara.leg.br/{database}/Ano-{ano}.{formato}.zip"
+            filename = url.split("/")[-1]
+            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            if not os.path.exists(filepath):
+                file_zip = wget.download(url)
+                if not file_zip:
+                    raise HTTPException(status_code=400, detail="Falha ao baixar o arquivo")
+                with zipfile.ZipFile(file_zip) as z:
+                    z.extractall("C:/Users/eduar/Documents/datalake")
+                os.remove(file_zip)
+                if os.path.exists(filepath):
+                    raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")            
+        elif database in ["frentes","frentesDeputados","deputados","deputadosOcupacoes","deputadosProfissoes"]:
+            if ano:
+                raise HTTPException(status_code=400, detail="Esta base não aceita ano")
+            url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}.{formato}"
+            filename = f"{database}.{formato}"
+            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            if not os.path.exists(filepath):
+                wget.download(url, out="C:/Users/eduar/Documents/datalake")
+            if os.path.exists(filepath):
+                raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")        
+        else:
+            if not ano:
+                raise HTTPException(status_code=400, detail="O ano é obrigatório para esta base de dados")
+            url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}-{ano}.{formato}"
+            filename = f"{database}-{ano}.{formato}"
+            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            if not os.path.exists(filepath):
+                wget.download(url, out="C:/Users/eduar/Documents/datalake")
+            if os.path.exists(filepath):
+                raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")
 
-        # Fazer download do arquivo
-        file_zip = wget.download(url)
 
-        # Verificar se o arquivo foi baixado com sucesso
-        if not file_zip:
-            raise HTTPException(status_code=500, detail="Falha ao baixar o arquivo")
-
-        # Descompactar o arquivo
-        with zipfile.ZipFile(file_zip) as z:
-            z.extractall("../datasets")
-
-        # Remover o arquivo compactado
-        os.remove(file_zip)
 
         # Retornar a mensagem de sucesso
-        return {"message": f"Arquivo baixado e descompactado com sucesso: {database}/Ano-{year}.{formato}"}
+        return {"message": f"Arquivo baixado com sucesso: datalake/{filename}"}
     
 if __name__ == "__main__":
-  c = Crawler_deputados()
+  c = CrawlerDeputados()
