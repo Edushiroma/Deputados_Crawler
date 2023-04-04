@@ -35,34 +35,30 @@ class CrawlerDeputados():
                     raise HTTPException(status_code=400, detail="Falha ao baixar o arquivo")
                 with zipfile.ZipFile(file_zip) as z:
                     z.extractall("C:/Users/eduar/Documents/datalake")
-                os.remove(file_zip)
-                if os.path.exists(filepath):
-                    raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")            
+                os.remove(file_zip)        
         elif database in ["frentes","frentesDeputados","deputados","deputadosOcupacoes","deputadosProfissoes"]:
             if ano:
                 raise HTTPException(status_code=400, detail="Esta base não aceita ano")
             url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}.{formato}"
             filename = f"{database}.{formato}"
             filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
-            if not os.path.exists(filepath):
-                wget.download(url, out="C:/Users/eduar/Documents/datalake")
             if os.path.exists(filepath):
-                raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")        
+                raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")     
+            if not os.path.exists(filepath):
+                wget.download(url, out="C:/Users/eduar/Documents/datalake")   
         else:
             if not ano:
                 raise HTTPException(status_code=400, detail="O ano é obrigatório para esta base de dados")
             url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}-{ano}.{formato}"
             filename = f"{database}-{ano}.{formato}"
             filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
-            if not os.path.exists(filepath):
-                wget.download(url, out="C:/Users/eduar/Documents/datalake")
             if os.path.exists(filepath):
                 raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")
+            if not os.path.exists(filepath):
+                wget.download(url, out="C:/Users/eduar/Documents/datalake")
+
 
 
 
         # Retornar a mensagem de sucesso
         return {"message": f"Arquivo baixado com sucesso: datalake/{filename}"}
-    
-if __name__ == "__main__":
-  c = CrawlerDeputados()
