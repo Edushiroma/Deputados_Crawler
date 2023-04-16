@@ -29,6 +29,16 @@ Exemplo de requisição:
 }
 ```
 
+Exemplo de requisição:
+
+##### Json
+```
+{
+  "database": "deputados",
+  "formato" : "json"
+}
+```
+
 ### Desenvolvedor
 Autor: Eduardo Shiroma
 
