@@ -28,34 +28,34 @@ class CrawlerDeputados():
                 raise HTTPException(status_code=400, detail="O ano é obrigatório para esta base de dados")
             url = f"http://www.camara.leg.br/{database}/Ano-{ano}.{formato}.zip"
             filename = url.split("/")[-1]
-            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            filepath = os.path.join("C:/Users/Documents/datalake", filename)  #inserir informação da pasta que deseja carregar as tabelas
             if not os.path.exists(filepath):
                 file_zip = wget.download(url)
                 if not file_zip:
                     raise HTTPException(status_code=400, detail="Falha ao baixar o arquivo")
                 with zipfile.ZipFile(file_zip) as z:
-                    z.extractall("C:/Users/eduar/Documents/datalake")
+                    z.extractall("C:/Users/Documents/datalake") #inserir informação da pasta que deseja carregar as tabelas
                 os.remove(file_zip)        
         elif database in ["frentes","frentesDeputados","deputados","deputadosOcupacoes","deputadosProfissoes"]:
             if ano:
                 raise HTTPException(status_code=400, detail="Esta base não aceita ano")
             url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}.{formato}"
             filename = f"{database}.{formato}"
-            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            filepath = os.path.join("C:/Users/Documents/datalake", filename)  #inserir informação da pasta que deseja carregar as tabelas
             if os.path.exists(filepath):
                 raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")     
             if not os.path.exists(filepath):
-                wget.download(url, out="C:/Users/eduar/Documents/datalake")   
+                wget.download(url, out="C:/Users/Documents/datalake")    #inserir informação da pasta que deseja carregar as tabelas
         else:
             if not ano:
                 raise HTTPException(status_code=400, detail="O ano é obrigatório para esta base de dados")
             url = f"http://dadosabertos.camara.leg.br/arquivos/{database}/{formato}/{database}-{ano}.{formato}"
             filename = f"{database}-{ano}.{formato}"
-            filepath = os.path.join("C:/Users/eduar/Documents/datalake", filename)
+            filepath = os.path.join("C:/Users/Documents/datalake", filename)  #inserir informação da pasta que deseja carregar as tabelas
             if os.path.exists(filepath):
                 raise HTTPException(status_code=400, detail="Arquivo já existe no datalake")
             if not os.path.exists(filepath):
-                wget.download(url, out="C:/Users/eduar/Documents/datalake")
+                wget.download(url, out="C:/Users/Documents/datalake")  #inserir informação da pasta que deseja carregar as tabelas
 
 
 
