@@ -44,4 +44,3 @@ Autor: Eduardo Shiroma
 
 Link: https://www.linkedin.com/in/eduardo-shiroma-44b82ab3/
 
-Código desenvolvido para Trabalho de Conclusão de Curso II
